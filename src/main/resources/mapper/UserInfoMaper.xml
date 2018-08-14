@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--<mapper namespace="cj4.userMapper">-->
+<!--<select id="selectAll" resultType="cn.edu.jxufe.entityty.UserInfo">-->
+<!--select * from user;-->
+<!--</select>-->
+
+<!--<insert id="addUser" parameterType="cn.edu.jxufe.entityty.UserInfo">-->
+<!--insert into user(uname,password,roleid,createtime,score) values(#{uname},#{password},1,sysdate(),#{score});-->
+<!--</insert>-->
+
+<!--<delete id="deleteUser" parameterType="java.lang.Integer">-->
+<!--delete from user where uid=#{0};-->
+<!--</delete>-->
+<!--</mapper>-->
+<mapper namespace="cn.edu.jxufe.dao.UserInfoDAO">
+    <select id="findAll" resultMap="UserInfoMap">
+      select * from user;
+    </select>
+
+
+
+    <select id="findAllAssociation1" resultMap="UserInfoMap">
+      select * from user join roleinfo on user.roleid=roleinfo.roleid;
+    </select>
+
+    <select id="findAllAssociation2" resultMap="UserInfoMapAS2">
+      select * from user;
+    </select>
+
+    <select id="findByRoleId" parameterType="java.lang.Integer" resultType="cn.edu.jxufe.entity.RoleInfo">
+      select * from  roleinfo where roleid=#{0};
+    </select>
+
+    <insert id="addUser" parameterType="cn.edu.jxufe.entity.UserInfo">
+        insert into user(uname,password,roleid,createtime,score) values(#{uname},#{password},1,sysdate(),#{score});
+    </insert>
+
+    <update id="updateUser" parameterType="cn.edu.jxufe.entity.UserInfo">
+        update user
+        <set>
+            <if test="@cn.edu.jxufe.utils.StringUtils@isNotNULL(uname)">
+                u_name=#{uname},
+            </if>
+            <if test="@cn.edu.jxufe.utils.StringUtils@isNotNULL(password)">
+                password=#{password},
+            </if>
+            <if test="@cn.edu.jxufe.utils.StringUtils@isNotNULL(roleid)">
+                roleid=#{roleid},
+            </if>
+            <if test="@cn.edu.jxufe.utils.StringUtils@isNotNULL(score)">
+                score=#{score},
+            </if>
+        </set>
+        where u_id=#{uid};
+    </update>
+
+    <delete id="deleteUser" parameterType="java.lang.Integer" >
+        delete from user where uid=#{0};
+    </delete>
+
+    <resultMap id="UserInfoMap" type="cn.edu.jxufe.entity.UserInfo">
+        <id column="u_id" property="uid"></id>
+        <result column="u_name" property="uname"></result>
+        <result column="create_time" property="createtime"></result>
+        <result column="password" property="password"></result>
+        <result column="score" property="score"></result>
+        <association property="roleInfo" javaType="cn.edu.jxufe.entity.RoleInfo">
+            <id column="roleid" property="roleId"></id>
+            <result column="roleName" property="roleName"></result>
+        </association>
+    </resultMap>
+
+    <resultMap id="UserInfoMapAS2" type="cn.edu.jxufe.entity.UserInfo">
+        <id column="u_id" property="uid"></id>
+        <result column="u_name" property="uname"></result>
+        <result column="create_time" property="createtime"></result>
+        <result column="password" property="password"></result>
+        <result column="score" property="score"></result>
+        <association property="roleInfo" column="roleid" select="findByRoleId">
+            <id column="roleid" property="roleId"></id>
+            <result column="roleName" property="roleName"></result>
+        </association>
+    </resultMap>
+</mapper>
+
